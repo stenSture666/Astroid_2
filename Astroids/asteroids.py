@@ -108,6 +108,14 @@ class Asteroids( Game ):
                 print("krock")
                 self.running=False
 
+            p = asteroid.getRotatedPoints()
+            for bullet in self.bullets:
+                for point in p:
+                    if bullet.contains(point):
+                        self.asteroids.remove(asteroid)
+
+
+
             #for bullet in self.bullets:
              #   asteroid.collide(bullet)
               #  print("bullet")
