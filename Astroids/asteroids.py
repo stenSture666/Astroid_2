@@ -2,6 +2,7 @@ import sys
 import random
 import pygame
 import math
+import time
 from pygame.locals import *
 from ship import Ship
 from astroid import Astroid
@@ -17,7 +18,7 @@ class Asteroids( Game ):
     """
     def __init__(self, name, width, height):
         super().__init__( name, width, height )
-
+        pygame.init()  # to enable timer
         self.ship = Ship() #  TODO: should create a Ship object here
         # TODO: should create asteroids
         astroids = [Astroid(x=150,y=300,movement=Point(1,1),ang_vel=1),Astroid(x=50,y=100,movement=Point(1,-1),ang_vel=1),Astroid(x=400,y=400,movement=Point(-1,1),ang_vel=-1)]
@@ -43,11 +44,13 @@ class Asteroids( Game ):
         if keys_pressed[K_DOWN] and self.ship:
             self.ship.accelerate(0)
         if keys_pressed[K_SPACE] and self.ship:
-            bullet = Bullet()
-            bullet.position=self.ship.position
-            bullet.pull.x = (2 * math.cos(math.radians(self.ship.rotation)))
-            bullet.pull.y = (2 * math.sin(math.radians(self.ship.rotation)))
-            self.bullets.append(bullet)
+
+                bullet = Bullet()
+                bullet.timer = pygame.time.get_ticks()
+                bullet.position=self.ship.position
+                bullet.pull.x = (2 * math.cos(math.radians(self.ship.rotation)))
+                bullet.pull.y = (2 * math.sin(math.radians(self.ship.rotation)))
+                self.bullets.append(bullet)
             # TODO: should create a bullet when the user fires
 
 
@@ -64,9 +67,11 @@ class Asteroids( Game ):
             asteroid.update( self.width, self.height )
         for star in self.stars:
             star.update( self.width, self.height )
-        for bullet in self.bullets:                       #ny
-            bullet.update(self.width, self.height)
-        # TODO: should probably call update on our bullet/bullets here
+        for bullet in self.bullets: #ny
+            if ((pygame.time.get_ticks() - bullet.timer)/1000) < 1:
+                bullet.update(self.width, self.height)
+            else:
+                self.bullets.remove(bullet)        # TODO: should probably call update on our bullet/bullets here
         # TODO: should probably work out how to remove a bullet when it gets old
         self.handle_collisions()
 
